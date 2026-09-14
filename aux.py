@@ -7,6 +7,7 @@ def distance(p, q):
     dlat, dlon = qlat - plat, qlon - plon
 
     intermediate = (math.sin(dlat / 2) ** 2) + math.cos(plat) * math.cos(qlat) * (math.sin(dlon / 2) ** 2)
+    intermediate = max(0.0, min(1.0, intermediate))
 
     angle = 2 * math.atan2(math.sqrt(intermediate), math.sqrt(1 - intermediate))
     return angle # distance is radius * angle of the sector
