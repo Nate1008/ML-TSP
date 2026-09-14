@@ -1,4 +1,4 @@
-from aux import distance
+from aux import distance, tour_distance
 import math
 
 def create_distance_matrix(cities):
@@ -20,7 +20,7 @@ def two_opt(order, cities):
         improved = False
         for i in range(n - 1):
             for j in range(i + 2, n):
-                a, b, c, d = order[i], i + 1, j, (j + 1) % n
+                a, b, c, d = order[i], order[i + 1], order[j], order[(j + 1) % n]
                 delta = - distance(cities[a], cities[b]) - distance(cities[c], cities[d]) + distance(cities[a], cities[c]) + distance(cities[b], cities[d])
 
                 if (delta < 0):
@@ -49,10 +49,12 @@ def nearest_neighbour(cities):
             if i in seen:
                 continue
 
-            if (best < dist[cur][i]):
+            if (best > dist[cur][i]):
                 nxt = i
                 best = dist[cur][nxt]
 
         order.append(nxt)
         seen.add(nxt)
         cur = nxt
+
+    return order

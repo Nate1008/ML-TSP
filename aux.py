@@ -12,9 +12,9 @@ def distance(p, q):
     angle = 2 * math.atan2(math.sqrt(intermediate), math.sqrt(1 - intermediate))
     return angle # distance is radius * angle of the sector
 
-def total_distance(cities):
+def tour_distance(order, cities):
     res = 0
-    for i in range(0, len(cities)):
-        res += distance(cities[i - 1], cities[i])
+    for i in range(0, len(order)):
+        res += distance(cities[order[i - 1]], cities[order[i]])
 
     return res
