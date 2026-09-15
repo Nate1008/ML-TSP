@@ -94,7 +94,8 @@ def create_initial_data(cities, population_size):
         shuffle(order)
         order = two_opt(order, cities)
         tours.append(order)
-        print(_)
+        if (_ % population_size == 0):
+            print(_)
 
     return prune_tours(tours, cities, population_size)
 
