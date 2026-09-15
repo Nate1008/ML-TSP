@@ -11,7 +11,7 @@ from dataset import TourDataset
 from aux import tour_distance
 from heuristics import two_opt
 
-K = 7
+K = 2
 EPOCHS = 10
 
 def train(model, data_loader, optimizer, device, verbose=False):   
