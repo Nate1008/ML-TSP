@@ -29,13 +29,12 @@ def get_device():
 
     return device
 
-def save_checkpoint(path, model, optimizer, round, temperature):
+def save_checkpoint(path, model, optimizer, round):
     torch.save(
         {
             "model": model.state_dict(),
             "optimizer": optimizer.state_dict(),
             "round": round,
-            "temperature": temperature
         },
         PATH+f"/checkpoint_round_{round}.pt"
     )
