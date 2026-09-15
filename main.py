@@ -11,7 +11,7 @@ CAPITALS = "world_capitals.csv"
 TOP150 = "world_cities_150.csv"
 
 EARTH_RADIUS = 6371 # ~6371 KM 
-EPOCHS = 30
+ROUNDS = 30
 POP_SIZE = 10
 TEMP = 0.9
 VERBOSE = True
@@ -29,15 +29,15 @@ def get_device():
 
     return device
 
-def save_checkpoint(path, model, optimizer, epoch, temperature):
+def save_checkpoint(path, model, optimizer, round, temperature):
     torch.save(
         {
             "model": model.state_dict(),
             "optimizer": optimizer.state_dict(),
-            "epoch": epoch,
+            "round": round,
             "temperature": temperature
         },
-        PATH+f"checkpoint_epoch_{epoch}.pt"
+        PATH+f"checkpoint_round_{round}.pt"
     )
 
 names, cities = load_locations(CAPITALS)
@@ -50,7 +50,7 @@ model = TSPTransformer(N).to(device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=1e-4)
 
 tours = []
-for epoch in range(EPOCHS):
-    model, tours = step(epoch, model, optimizer, tours, cities, POP_SIZE, TEMP, device, VERBOSE)
-    save_checkpoint(PATH, model, optimizer, epoch, TEMP)
+for round in range(ROUNDS):
+    model, tours = step(round, model, optimizer, tours, cities, POP_SIZE, TEMP, device, VERBOSE)
+    save_checkpoint(PATH, model, optimizer, round, TEMP)
 

@@ -8,16 +8,13 @@ from torch.utils.data import DataLoader
 import torch.nn.functional as F
 
 from dataset import TourDataset
-from model import TSPTransformer
 from aux import tour_distance
 from heuristics import two_opt
 
 K = 3
+EPOCHS = 5
 
-def train(epoch, model, data_loader, optimizer, device, verbose=False):   
-    if verbose:
-        print(f"Started Epoch {epoch}!")
-
+def train(model, data_loader, optimizer, device, verbose=False):   
     model.train()
 
     total_loss = 0
@@ -48,8 +45,7 @@ def train(epoch, model, data_loader, optimizer, device, verbose=False):
         total_loss += loss.item() * token_count
         total_tokens += token_count
 
-    if verbose:
-        print(f"Loss: {(total_loss / total_tokens):.4f}")
+    
 
     return total_loss / total_tokens
 
@@ -115,9 +111,9 @@ def evaluate(tours, cities):
 
     return best, (avg / len(tours))
 
-def step(epoch, model, optimizer, old_tours, cities, population_size, temperature, device, verbose=False):
+def step(round, model, optimizer, old_tours, cities, population_size, temperature, device, verbose=False):
     tours = None
-    if epoch == 0:
+    if round == 0:
         assert len(old_tours) == 0
         tours = create_initial_data(cities, population_size)
         if verbose:
@@ -126,15 +122,18 @@ def step(epoch, model, optimizer, old_tours, cities, population_size, temperatur
         new_tours = generate_tours(model, K * population_size, temperature)   
 
         if verbose:
-            print(f"Generated Tours using Model from Epoch {epoch - 1}")
+            print(f"Generated Tours using Model from Round {round - 1}")
         
         if verbose:
             best, avg = evaluate(tours)
-            print(f"Model from Epoch: {epoch - 1} ===> Best: {best} | Average: {avg}")
+            print(f"Model from Round: {round - 1} ===> Best: {best} | Average: {avg}")
     
         tours = create_next_generation(old_tours, new_tours, cities, population_size)
 
-    train(epoch, model, make_loader(model.num_cities, tours, 128), optimizer, device, verbose)
+    for epoch in range(EPOCHS):
+        loss = train(model, make_loader(model.num_cities, tours, 128), optimizer, device, verbose)
+        if verbose:
+            print(f"Epoch: {epoch} | Loss: {loss:.4f}")
 
     return model, tours
     

@@ -28,7 +28,7 @@ class TSPTransformer(nn.Module):
             norm_first=True
         )
 
-        self.transfomer = nn.TransformerEncoder(
+        self.transformer = nn.TransformerEncoder(
             layer,
             num_layers=num_layers,
             norm=nn.LayerNorm(embedding_dim),
@@ -44,11 +44,11 @@ class TSPTransformer(nn.Module):
     def forward(self, tokens):
         batch_size, sequence_length = tokens.shape
 
-        positions = torch.arrange(sequence_length, device=tokens.device)
+        positions = torch.arange(sequence_length, device=tokens.device)
 
         hidden = (self.token_embedding(tokens) + self.position_embedding(positions)[None, :, :])
 
-        causal_mask = torch.trui(
+        causal_mask = torch.triu(
             torch.ones(sequence_length, sequence_length, dtype=torch.bool, device=tokens.device),
             diagonal=1
         )
