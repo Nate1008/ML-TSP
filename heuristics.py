@@ -32,11 +32,8 @@ def two_opt(order, cities):
                 delta = - distance(cities[a], cities[b]) - distance(cities[c], cities[d]) + distance(cities[a], cities[c]) + distance(cities[b], cities[d])
 
                 if (delta < -EPS):
-                    # print("Improved?:", delta)
-                    order = order[:i + 1] + order[i + 1:j + 1][::-1] + order[j + 1:]
+                    order[i + 1:j + 1] = reversed(order[i + 1:j + 1])
                     improved = True
-
-        # print(tour_distance(order, cities))
 
         if not improved:
             break

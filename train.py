@@ -99,7 +99,7 @@ def create_initial_data(cities, population_size):
     return prune_tours(tours, cities, population_size)
 
 def create_next_generation(old_tours, new_tours, cities, population_size):
-    tours = [two_opt(new_tours[i], cities) for i in range(new_tours)] + old_tours;
+    tours = [two_opt(new_tours[i], cities) for i in range(len(new_tours))] + old_tours;
     return prune_tours(tours, cities, population_size)
 
 def evaluate(tours, cities):
@@ -119,13 +119,13 @@ def step(round, model, optimizer, old_tours, cities, population_size, temperatur
         if verbose:
             print("Initialized! Beginning Training Process!")
     else:
-        new_tours = generate_tours(model, K * population_size, temperature)   
+        new_tours = generate_tours(model, K * population_size, temperature).cpu().tolist() 
 
         if verbose:
             print(f"Generated Tours using Model from Round {round - 1}")
         
         if verbose:
-            best, avg = evaluate(tours)
+            best, avg = evaluate(new_tours, cities)
             print(f"Model from Round: {round - 1} ===> Best: {best} | Average: {avg}")
     
         tours = create_next_generation(old_tours, new_tours, cities, population_size)
