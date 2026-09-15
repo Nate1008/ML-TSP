@@ -12,6 +12,8 @@ from model import TSPTransformer
 from aux import tour_distance
 from heuristics import two_opt
 
+K = 10
+
 def train(model, data_loader, optimizer, device, verbose=False):
     model.train()
 
@@ -88,7 +90,7 @@ def generate_tours(model, batch_size, temperature, start_city=0):
 def create_initial_data(cities, population_size):
     n = len(cities)
     tours = []
-    for _ in range(10 * population_size):
+    for _ in range(K * population_size):
         order = shuffle([i for i in range(n)])
         order = two_opt(order)
         tours.append(order)
@@ -116,7 +118,7 @@ def step(epoch, model, optimizer, old_tours, cities, population_size, temperatur
         if verbose:
             print("Initialized! Beginning Training Process!")
     else:
-        new_tours = generate_tours(model, 10 * population_size, temperature)   
+        new_tours = generate_tours(model, K * population_size, temperature)   
         
         if verbose:
             best, avg = evaluate(tours)
