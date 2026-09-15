@@ -92,13 +92,13 @@ def create_initial_data(cities, population_size):
     tours = []
     for _ in range(K * population_size):
         order = shuffle([i for i in range(n)])
-        order = two_opt(order)
+        order = two_opt(order, cities)
         tours.append(order)
 
     return prune_tours(tours, cities, population_size)
 
 def create_next_generation(old_tours, new_tours, cities, population_size):
-    tours = [two_opt(new_tours[i]) for i in range(new_tours)] + old_tours;
+    tours = [two_opt(new_tours[i], cities) for i in range(new_tours)] + old_tours;
     return prune_tours(tours, cities, population_size)
 
 def evaluate(tours, cities):

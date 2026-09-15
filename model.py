@@ -31,7 +31,8 @@ class TSPTransformer(nn.Module):
         self.transfomer = nn.TransformerEncoder(
             layer,
             num_layers=num_layers,
-            norm=nn.LayerNorm(embedding_dim)
+            norm=nn.LayerNorm(embedding_dim),
+            enable_nested_tensor=False
         )
 
         self.output = nn.Linear(
