@@ -12,7 +12,7 @@ from model import TSPTransformer
 from aux import tour_distance
 from heuristics import two_opt
 
-K = 5
+K = 3
 
 def train(epoch, model, data_loader, optimizer, device, verbose=False):   
     if verbose:
@@ -53,10 +53,9 @@ def train(epoch, model, data_loader, optimizer, device, verbose=False):
 
     return total_loss / total_tokens
 
-def make_loader(model, tours):
-    tours_dataset = TourDataset(tours, model.num_cities)
-    data_loader = DataLoader(tours_dataset, batch_size=128, shuffle=True)
-    return data_loader
+def make_loader(num_cities, tours, batch_size):
+    tours_dataset = TourDataset(tours, num_cities)
+    return DataLoader(tours_dataset, batch_size=batch_size, shuffle=True)
 
 @torch.no_grad()
 def generate_tours(model, batch_size, temperature, start_city=0):
@@ -99,6 +98,7 @@ def create_initial_data(cities, population_size):
         shuffle(order)
         order = two_opt(order, cities)
         tours.append(order)
+        print(_)
 
     return prune_tours(tours, cities, population_size)
 
@@ -115,7 +115,7 @@ def evaluate(tours, cities):
 
     return best, (avg / len(tours))
 
-def step(epoch, model, optimizer, old_tours, cities, population_size, temperature, verbose=False):
+def step(epoch, model, optimizer, old_tours, cities, population_size, temperature, device, verbose=False):
     tours = None
     if epoch == 0:
         assert len(old_tours) == 0
@@ -134,15 +134,20 @@ def step(epoch, model, optimizer, old_tours, cities, population_size, temperatur
     
         tours = create_next_generation(old_tours, new_tours, cities, population_size)
 
-    model = train(epoch, tours, make_loader(tours), optimizer, model.device, verbose)
+    train(epoch, model, make_loader(model.num_cities, tours, 128), optimizer, device, verbose)
+
     return model, tours
     
 def prune_tours(tours, cities, population_size):
+    unique = set()
     for i in range(len(tours)):
-        pos = tours[i].find(0)
-        tours[i] = tours[i][pos:] + tours[i][:pos]
+        tour = [int(city) for city in tours[i]]
+        pos = tour.index(0)
+        forwards = tour[pos:] + tour[:pos]
 
-    unique = set(tuple(tours))
+        backwards = [forwards[0], *reversed(forwards[1:])]
+
+        unique.add(min(tuple(forwards), tuple(backwards)))
 
     ranked = sorted(unique, key=lambda tour: tour_distance(tour, cities))
 

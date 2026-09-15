@@ -3,6 +3,8 @@ import math
 
 D = None
 
+EPS = 1e-9
+
 def create_distance_matrix(cities):
     global D
     if (D != None):
@@ -29,9 +31,12 @@ def two_opt(order, cities):
                 a, b, c, d = order[i], order[i + 1], order[j], order[(j + 1) % n]
                 delta = - distance(cities[a], cities[b]) - distance(cities[c], cities[d]) + distance(cities[a], cities[c]) + distance(cities[b], cities[d])
 
-                if (delta < 0):
+                if (delta < -EPS):
+                    # print("Improved?:", delta)
                     order = order[:i + 1] + order[i + 1:j + 1][::-1] + order[j + 1:]
                     improved = True
+
+        # print(tour_distance(order, cities))
 
         if not improved:
             break

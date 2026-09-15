@@ -21,6 +21,8 @@ class TourDataset(Dataset):
         if not torch.all(tours_tensor[:, 0] == 0):
             assert False # must start at 0
 
+        self.targets = tours_tensor
+
         bos = torch.full(
             (len(tours_tensor), 1),
             self.bos_token,
@@ -36,4 +38,4 @@ class TourDataset(Dataset):
         return len(self.targets)
 
     def __getitem__(self, index):
-        return self.inputs[index] + self.targets[index]
+        return self.inputs[index], self.targets[index]

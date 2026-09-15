@@ -12,7 +12,7 @@ TOP150 = "world_cities_150.csv"
 
 EARTH_RADIUS = 6371 # ~6371 KM 
 EPOCHS = 30
-POP_SIZE = 20
+POP_SIZE = 10
 TEMP = 0.9
 VERBOSE = True
 TEST_NUMBER = 1
@@ -51,6 +51,6 @@ optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=1e-4)
 
 tours = []
 for epoch in range(EPOCHS):
-    model, tours = step(epoch, model, optimizer, tours, cities, POP_SIZE, TEMP, VERBOSE)
+    model, tours = step(epoch, model, optimizer, tours, cities, POP_SIZE, TEMP, device, VERBOSE)
     save_checkpoint(PATH, model, optimizer, epoch, TEMP)
 
