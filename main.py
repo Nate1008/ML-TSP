@@ -1,28 +1,43 @@
+import torch
+
 from aux import tour_distance
 from heuristics import two_opt, nearest_neighbour
 from data import load_locations
-
+from model import TSPTransformer
+from dataset import TourDataset
+from train import *
 
 CAPITALS = "world_capitals.csv"
 TOP150 = "world_cities_150.csv"
 
 EARTH_RADIUS = 6371 # ~6371 KM 
+EPOCHS = 30
+POP_SIZE = 2000
+TEMP = 0.9
+VERBOSE = True
+
+# Get Device
+if torch.backends.mps.is_available():
+    device = torch.device("mps")
+elif torch.cuda.is_available():
+    device = torch.device("cuda")
+else:
+    device = torch.device("cpu")
+
+
 
 names, cities = load_locations(CAPITALS)
-
 N = len(cities)
 
-order = [i for i in range(N)]
 
-print(tour_distance(order, cities))
+model = TSPTransformer(N).to(device)
+optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=1e-4)
 
-order = two_opt(order, cities)
+tours = []
+for epoch in range(EPOCHS):
+   model, tours = step(epoch, model, optimizer, tours, cities, POP_SIZE, TEMP, VERBOSE)
 
-print(tour_distance(order, cities))
 
-order = nearest_neighbour(cities)
-
-print(tour_distance(order, cities))
 
 
 
