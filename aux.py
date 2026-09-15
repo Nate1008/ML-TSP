@@ -1,8 +1,8 @@
 import math
 
 def distance(p, q):
-    # plat, plon = map(math.radians, p)
-    # qlat, qlon = map(math.radians, q)
+    plat, plon = map(math.radians, p)
+    qlat, qlon = map(math.radians, q)
     plat, plon = p
     qlat, qlon = q
 

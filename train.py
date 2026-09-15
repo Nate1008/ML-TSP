@@ -90,7 +90,7 @@ def create_initial_data(cities, population_size):
     n = len(cities)
     
     tours = []
-    for _ in range(K * population_size):
+    for _ in range(len(GEN_TEMPS) * population_size):
         order = [i for i in range(n)]
         shuffle(order)
         order = two_opt(order, cities)
