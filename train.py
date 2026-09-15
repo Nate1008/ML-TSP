@@ -11,8 +11,9 @@ from dataset import TourDataset
 from aux import tour_distance
 from heuristics import two_opt
 
-K = 2
-EPOCHS = 10
+GEN_TEMPS = [0.8, 1.0, 1.2, 1.4]
+EPOCHS_INITIAL = 10
+EPOCHS_STANDARD = 2
 
 def train(model, data_loader, optimizer, device, verbose=False):   
     model.train()
@@ -100,7 +101,7 @@ def create_initial_data(cities, population_size):
     return prune_tours(tours, cities, population_size)
 
 def create_next_generation(old_tours, new_tours, cities, population_size):
-    tours = [two_opt(new_tours[i], cities) for i in range(len(new_tours))] + old_tours;
+    tours = new_tours + old_tours;
     return prune_tours(tours, cities, population_size)
 
 def evaluate(tours, cities):
@@ -112,7 +113,7 @@ def evaluate(tours, cities):
 
     return best, (avg / len(tours))
 
-def step(round, model, optimizer, old_tours, cities, population_size, batch_size, temperature, device, verbose=False):
+def step(round, model, optimizer, old_tours, cities, population_size, batch_size, device, verbose=False):
     tours = None
     if round == 0:
         assert len(old_tours) == 0
@@ -120,17 +121,30 @@ def step(round, model, optimizer, old_tours, cities, population_size, batch_size
         if verbose:
             print("Initialized! Beginning Training Process!")
     else:
-        new_tours = generate_tours(model, K * population_size, temperature).cpu().tolist() 
+        new_tours = []
+        for temp in GEN_TEMPS:
+            new_tours.extend(generate_tours(model, population_size, temp).cpu().tolist())
 
         if verbose:
             print(f"Generated Tours using Model from Round {round - 1}")
         
         if verbose:
             best, avg = evaluate(new_tours, cities)
-            print(f"Model from Round {round - 1}: ===> Best: {best} | Average: {avg}")
+            print(f"Model from Round {round - 1} (Pre-Opt): ===> Best: {best} | Average: {avg}")
+
+        new_tours = [two_opt(new_tours[i], cities) for i in range(len(new_tours))]
+
+        if verbose:
+            best, avg = evaluate(new_tours, cities)
+            print(f"Model from Round {round - 1} (Post-Opt): ===> Best: {best} | Average: {avg}")
     
         tours = create_next_generation(old_tours, new_tours, cities, population_size)
 
+    if verbose:
+        best, avg = evaluate(tours, cities)
+        print(f"Training Tours for Round {round}: ===> Best: {best} | Average: {avg}")
+
+    EPOCHS = EPOCHS_INITIAL if round == 0 else EPOCHS_STANDARD
     for epoch in range(EPOCHS):
         loss = train(model, make_loader(model.num_cities, tours, batch_size), optimizer, device, verbose)
         if verbose:

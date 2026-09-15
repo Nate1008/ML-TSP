@@ -29,7 +29,7 @@ def two_opt(order, cities):
         for i in range(n - 1):
             for j in range(i + 2, n):
                 a, b, c, d = order[i], order[i + 1], order[j], order[(j + 1) % n]
-                delta = - distance(cities[a], cities[b]) - distance(cities[c], cities[d]) + distance(cities[a], cities[c]) + distance(cities[b], cities[d])
+                delta = - D[a][b] - D[c][d] + D[a][c] + D[b][d]
 
                 if (delta < -EPS):
                     order[i + 1:j + 1] = reversed(order[i + 1:j + 1])
