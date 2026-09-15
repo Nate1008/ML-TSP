@@ -1,15 +1,21 @@
 from aux import distance, tour_distance
 import math
 
+D = None
+
 def create_distance_matrix(cities):
+    global D
+    if (D != None):
+        return D
+    
     n = len(cities)
-    dist = [[0 for j in range(n)] for i in range(n)]
+    D = [[0 for j in range(n)] for i in range(n)]
 
     for i in range(n):
         for j in range(i + 1, n):
-            dist[i][j] = dist[j][i] = distance(cities[i], cities[j])
+            D[i][j] = D[j][i] = distance(cities[i], cities[j])
 
-    return dist
+    return D
 
 def two_opt(order, cities):
 

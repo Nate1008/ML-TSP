@@ -12,7 +12,7 @@ TOP150 = "world_cities_150.csv"
 
 EARTH_RADIUS = 6371 # ~6371 KM 
 EPOCHS = 30
-POP_SIZE = 2000
+POP_SIZE = 20
 TEMP = 0.9
 VERBOSE = True
 TEST_NUMBER = 1
@@ -43,10 +43,11 @@ def save_checkpoint(path, model, optimizer, epoch, temperature):
 names, cities = load_locations(CAPITALS)
 N = len(cities)
 
+print(N)
+
 device = get_device()
 model = TSPTransformer(N).to(device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=1e-4)
-
 
 tours = []
 for epoch in range(EPOCHS):

@@ -12,9 +12,12 @@ from model import TSPTransformer
 from aux import tour_distance
 from heuristics import two_opt
 
-K = 10
+K = 5
 
-def train(model, data_loader, optimizer, device, verbose=False):
+def train(epoch, model, data_loader, optimizer, device, verbose=False):   
+    if verbose:
+        print(f"Started Epoch {epoch}!")
+
     model.train()
 
     total_loss = 0
@@ -89,9 +92,11 @@ def generate_tours(model, batch_size, temperature, start_city=0):
 
 def create_initial_data(cities, population_size):
     n = len(cities)
+    
     tours = []
     for _ in range(K * population_size):
-        order = shuffle([i for i in range(n)])
+        order = [i for i in range(n)]
+        shuffle(order)
         order = two_opt(order, cities)
         tours.append(order)
 
@@ -119,14 +124,17 @@ def step(epoch, model, optimizer, old_tours, cities, population_size, temperatur
             print("Initialized! Beginning Training Process!")
     else:
         new_tours = generate_tours(model, K * population_size, temperature)   
+
+        if verbose:
+            print(f"Generated Tours using Model from Epoch {epoch - 1}")
         
         if verbose:
             best, avg = evaluate(tours)
-            print(f"Epoch: {epoch} | Best: {best} | Average: {avg}")
+            print(f"Model from Epoch: {epoch - 1} ===> Best: {best} | Average: {avg}")
     
         tours = create_next_generation(old_tours, new_tours, cities, population_size)
 
-    model = train(tours, make_loader(tours), optimizer, model.device, verbose)
+    model = train(epoch, tours, make_loader(tours), optimizer, model.device, verbose)
     return model, tours
     
 def prune_tours(tours, cities, population_size):
