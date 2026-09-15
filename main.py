@@ -12,7 +12,8 @@ TOP150 = "world_cities_150.csv"
 
 EARTH_RADIUS = 6371 # ~6371 KM 
 ROUNDS = 30
-POP_SIZE = 10
+POP_SIZE = 2000
+BATCH_SIZE = 128
 TEMP = 0.9
 VERBOSE = True
 TEST_NUMBER = 1
@@ -37,7 +38,7 @@ def save_checkpoint(path, model, optimizer, round, temperature):
             "round": round,
             "temperature": temperature
         },
-        PATH+f"checkpoint_round_{round}.pt"
+        PATH+f"/checkpoint_round_{round}.pt"
     )
 
 names, cities = load_locations(CAPITALS)
@@ -51,6 +52,6 @@ optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=1e-4)
 
 tours = []
 for round in range(ROUNDS):
-    model, tours = step(round, model, optimizer, tours, cities, POP_SIZE, TEMP, device, VERBOSE)
+    model, tours = step(round, model, optimizer, tours, cities, POP_SIZE, BATCH_SIZE, TEMP, device, VERBOSE)
     save_checkpoint(PATH, model, optimizer, round, TEMP)
 

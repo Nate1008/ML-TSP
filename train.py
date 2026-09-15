@@ -11,8 +11,8 @@ from dataset import TourDataset
 from aux import tour_distance
 from heuristics import two_opt
 
-K = 3
-EPOCHS = 5
+K = 7
+EPOCHS = 10
 
 def train(model, data_loader, optimizer, device, verbose=False):   
     model.train()
@@ -111,7 +111,7 @@ def evaluate(tours, cities):
 
     return best, (avg / len(tours))
 
-def step(round, model, optimizer, old_tours, cities, population_size, temperature, device, verbose=False):
+def step(round, model, optimizer, old_tours, cities, population_size, batch_size, temperature, device, verbose=False):
     tours = None
     if round == 0:
         assert len(old_tours) == 0
@@ -126,12 +126,12 @@ def step(round, model, optimizer, old_tours, cities, population_size, temperatur
         
         if verbose:
             best, avg = evaluate(new_tours, cities)
-            print(f"Model from Round: {round - 1} ===> Best: {best} | Average: {avg}")
+            print(f"Model from Round {round - 1}: ===> Best: {best} | Average: {avg}")
     
         tours = create_next_generation(old_tours, new_tours, cities, population_size)
 
     for epoch in range(EPOCHS):
-        loss = train(model, make_loader(model.num_cities, tours, 128), optimizer, device, verbose)
+        loss = train(model, make_loader(model.num_cities, tours, batch_size), optimizer, device, verbose)
         if verbose:
             print(f"Epoch: {epoch} | Loss: {loss:.4f}")
 
