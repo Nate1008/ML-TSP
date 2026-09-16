@@ -129,13 +129,13 @@ def step(round, model, optimizer, old_tours, cities, population_size, batch_size
             print(f"Generated Tours using Model from Round {round - 1}")
         
         if verbose:
-            best, avg = evaluate(new_tours, cities)
+            best, avg = evaluate(new_tours[:population_size], cities) # only test the 0.8 temp
             print(f"Model from Round {round - 1} (Pre-Opt): ===> Best: {best} | Average: {avg}")
 
         new_tours = [two_opt(new_tours[i], cities) for i in range(len(new_tours))]
 
         if verbose:
-            best, avg = evaluate(new_tours, cities)
+            best, avg = evaluate(new_tours[:population_size], cities) # only test the 0.8 temp
             print(f"Model from Round {round - 1} (Post-Opt): ===> Best: {best} | Average: {avg}")
     
         tours = create_next_generation(old_tours, new_tours, cities, population_size)
