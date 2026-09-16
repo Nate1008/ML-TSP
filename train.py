@@ -11,9 +11,9 @@ from dataset import TourDataset
 from aux import tour_distance
 from heuristics import two_opt
 
-GEN_TEMPS = [0.8, 1.0, 1.2, 1.4]
+GEN_TEMPS = [0.8, 0.8, 0.9, 0.9, 1.0, 1.2, 1.4]
 EPOCHS_INITIAL = 10
-EPOCHS_STANDARD = 2
+EPOCHS_STANDARD = 10
 
 def train(model, data_loader, optimizer, device, verbose=False):   
     model.train()
